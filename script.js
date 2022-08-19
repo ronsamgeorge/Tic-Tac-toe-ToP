@@ -14,7 +14,7 @@ const gameBoard = (() => {
     //checkInputPosition will check if the slot is preFilled; 
     const checkInputPosition = (gridIndex) => {
         if(gameBoardArray[gridIndex] === undefined){   
-            return true;            // if the index value has undefined as the value it suggest that the input div is valid
+            return true;                                                              // if the index value has undefined as the value it suggest that the input div is valid
         }
         return false;
     }; 
@@ -22,14 +22,16 @@ const gameBoard = (() => {
 
     const updateGameBoardArray = (gridIndex, player) =>{
         
-        if(!checkInputPosition(gridIndex)){
+        if(!checkInputPosition(gridIndex)){ 
             alert("Position already occupied, Select a new position for the move");
             return;
         }
         
-        gameBoardArray[gridIndex] = player.getPlayerSign();
-        // console.log(gameBoardArray);
+        gameBoardArray[gridIndex] = player.getPlayerSign();                         //updates array index with the player sign;
         boardDisplayController.updateIndex(gridIndex,player);
+        gameFlow.gameLogic(gameBoardArray);
+
+
     };
 
     return {updateGameBoardArray};
@@ -50,33 +52,26 @@ const boardDisplayController = (() => {
 
 const gameFlow = ((gameBoardArray) => {
 
-
+    //Keeps track of the player turn/rotation;
     const playerTurns = () => {
-        if (currentPlayer === "player1"){
-            currentPlayer = player2
+        if (currentPlayer.getPlayerSign === player1.getPlayerSign){                //compares the playerSign with the currentPlayerSign, since X always goes first
+            currentPlayer = player2;
+            return;
         }
+        currentPlayer = player1;    
     };
 
     const checkResult = (gameBoardArray) => {
         if(checkVertical){} 
     };
 
-    return {}; 
-})();
-
-const calculator = (() => {
-
-    const add = (a, b) => a + b;
-    const sub = (a, b) => a - b;
-    const mul = (a, b) => a * b;
-    const div = (a, b) => a / b;
-    return {
-      add,
-      sub,
-      mul,
-      div,
+    const gameLogic = (gameboardArray) => {
+        playerTurns();
+        console.log(currentPlayer);
     };
-  })();
+
+    return {gameLogic}; 
+})();
 
 
 const testFunc = (index) =>{
@@ -87,8 +82,8 @@ const testFunc = (index) =>{
 const player1 = Player("P1", "X");
 const player2 = Player("P2", "O");
 let currentPlayer = player1;
-const divClicked = document.querySelectorAll(".game-board-divs");
 
+const divClicked = document.querySelectorAll(".game-board-divs");
 divClicked.forEach(div => div.addEventListener('click', function(){
 
     gameBoard.updateGameBoardArray(this.dataset.key,currentPlayer);
