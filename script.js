@@ -27,19 +27,30 @@ const gameBoard = (() => {
         }
         
         gameBoardArray[gridIndex] = player.getPlayerSign();                         //updates array index with the player sign;
-        boardDisplayController.updateIndex(gridIndex,player);
+        boardDisplayController.updateIndex(gridIndex,player.getPlayerSign());
         gameFlow.gameLogic(gameBoardArray);
     };
 
-    return {updateGameBoardArray};
+    const resetGameBoard = () => {
+        for(let i = 0; i <9; i++){
+            gameBoardArray[i] = undefined;
+            boardDisplayController.updateIndex(i,"");
+        }
+
+        currentPlayer = player1;
+        gameFlow.resetCounter();
+        return;
+    };
+
+    return {updateGameBoardArray, resetGameBoard};
 })();
 
 
 //Modules Accept the valid grid index and update the grid UI with the player entry
 const boardDisplayController = (() => {
-    const updateIndex = (grindIndex,player) => {
+    const updateIndex = (grindIndex,updateSign) => {
         let divDisplay = document.querySelector(`div[data-key="${grindIndex}"]`);  //uses the data-key custom data attribute select the div in the UI
-        divDisplay.textContent = player.getPlayerSign();
+        divDisplay.textContent = updateSign;
     };
 
     return {updateIndex};
@@ -53,7 +64,7 @@ const gameFlow = (() => {
     let gameTurnCount = 0;
 
     //Keeps track of the player turn/rotation;
-    const playerTurns = () => {
+    const updatePlayerTurns = () => {
         if (currentPlayer.getPlayerSign === player1.getPlayerSign){                //compares the playerSign with the currentPlayerSign, since X always goes first
             currentPlayer = player2;
             return;
@@ -94,11 +105,9 @@ const gameFlow = (() => {
 
 
     const checkWinCon = (gameBoardArray) => {
-        if(checkVertical(gameBoardArray) || checkHorizontal(gameBoardArray) || checkDiagonal(gameBoardArray)){
-            
+        if(checkVertical(gameBoardArray) || checkHorizontal(gameBoardArray) || checkDiagonal(gameBoardArray)){   
             return true;
-        } 
-
+        }
         return false;
     };
 
@@ -121,18 +130,18 @@ const gameFlow = (() => {
 
         if(checkTieCon()){
             console.log("Tie Game");
+            return;
         };
 
-        playerTurns(); 
+        updatePlayerTurns(); 
     };
 
-    return {gameLogic, gameTurnCount}; 
+    const resetCounter = () => {
+        gameTurnCount = 0;
+    }
+
+    return {gameLogic,resetCounter}; 
 })();
-
-
-const testFunc = (index) =>{
-    console.log(index);
-}
 
 
 const player1 = Player("P1", "X");
@@ -140,8 +149,12 @@ const player2 = Player("P2", "O");
 let currentPlayer = player1;
 
 const divClicked = document.querySelectorAll(".game-board-divs");
+
 divClicked.forEach(div => div.addEventListener('click', function(){
 
     gameBoard.updateGameBoardArray(this.dataset.key,currentPlayer);
 }));
 
+
+const resetButton = document.querySelector(".btn-reset");
+resetButton.addEventListener('click',gameBoard.resetGameBoard);
